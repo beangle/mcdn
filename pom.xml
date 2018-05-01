@@ -1,0 +1,91 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <groupId>org.beangle</groupId>
+    <artifactId>beangle-scala</artifactId>
+    <version>24.9</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.beangle.micdn</groupId>
+  <artifactId>beangle-micdn-server</artifactId>
+  <version>0.0.1</version>
+  <packaging>war</packaging>
+  <name>Beangle Micro CND Server</name>
+
+  <properties>
+    <bundle.symbolicName>org.beangle.micdn</bundle.symbolicName>
+    <bundle.namespace>org.beangle.micdn</bundle.namespace>
+    <beangle.mvc.version>0.3.17</beangle.mvc.version>
+    <beangle.cdi.version>0.0.15</beangle.cdi.version>
+    <beangle.maven.version>0.3.11</beangle.maven.version>
+    <beangle.repo.version>0.0.3</beangle.repo.version>
+  </properties>
+
+  <description>
+    Beangle Micro CND Server
+  </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.beangle.webmvc</groupId>
+      <artifactId>beangle-webmvc-core_2.12</artifactId>
+      <version>${beangle.mvc.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.beangle.cdi</groupId>
+      <artifactId>beangle-cdi-spring_2.12</artifactId>
+      <version>${beangle.cdi.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.beangle.repo</groupId>
+      <artifactId>beangle-repo-artifact_2.12</artifactId>
+      <version>${beangle.repo.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.beangle.maven</groupId>
+        <artifactId>beangle-maven-plugin</artifactId>
+        <version>${beangle.maven.version}</version>
+        <configuration>
+          <dependencyIncludes>*:*</dependencyIncludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>generate</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>sas</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <packagingExcludes>
+          %regex[WEB-INF/lib/.*[^T].jar]
+          </packagingExcludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
