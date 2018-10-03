@@ -3,22 +3,22 @@
   <parent>
     <groupId>org.beangle</groupId>
     <artifactId>beangle-scala</artifactId>
-    <version>24.10</version>
+    <version>25.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.beangle.micdn</groupId>
   <artifactId>beangle-micdn-server</artifactId>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
   <packaging>war</packaging>
   <name>Beangle Micro CDN Server</name>
 
   <properties>
     <bundle.symbolicName>org.beangle.micdn</bundle.symbolicName>
     <bundle.namespace>org.beangle.micdn</bundle.namespace>
-    <beangle.mvc.version>0.3.18</beangle.mvc.version>
-    <beangle.cdi.version>0.0.16</beangle.cdi.version>
-    <beangle.maven.version>0.3.12</beangle.maven.version>
-    <beangle.repo.version>0.0.4</beangle.repo.version>
+    <beangle.mvc.version>0.3.22</beangle.mvc.version>
+    <beangle.cdi.version>0.0.17</beangle.cdi.version>
+    <beangle.maven.version>0.3.14</beangle.maven.version>
+    <beangle.repo.version>0.0.5</beangle.repo.version>
   </properties>
 
   <description>
