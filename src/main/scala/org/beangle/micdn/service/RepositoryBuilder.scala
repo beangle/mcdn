@@ -94,7 +94,7 @@ object RepositoryBuilder {
     if (!notexists.isEmpty) {
       throw new RuntimeException(s"Cannot download these artifacts:$notexists")
     }
-    new Repository(subRepos.toList)
+    new Repository(url, subRepos.toList)
   }
 
   private def buildJarLoader(gav: String, file: String, location: String, localRepo: Repo.Local,
