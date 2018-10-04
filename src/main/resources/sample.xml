@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<micdn>
+  <contents>
+    <url prefix="/bootstrap">
+       <webjar gav="org.webjars:bootstrap:3.3.7"/>
+    </url>
+    <url prefix="/font-awesome/">
+       <webjar gav="org.webjars:font-awesome:4.7.0"/>
+    </url>
+    <url prefix="/jquery">
+       <webjar gav="org.webjars:jquery:1.10.2"/>
+    </url>
+    <url prefix="/cryptojs">
+       <webjar gav="org.webjars:cryptojs:3.1.2"/>
+    </url>
+  </contents>
+</micdn>

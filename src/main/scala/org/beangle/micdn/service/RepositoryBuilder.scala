@@ -29,10 +29,8 @@ import org.beangle.repo.artifact.{ Artifact, ArtifactDownloader, Repo }
 import org.beangle.commons.lang.SystemInfo
 
 object RepositoryBuilder {
-  def build(file: File): Repository = {
-    require(file.exists(), s"${file.getAbsolutePath} doesn't exists!")
-
-    val xml = scala.xml.XML.load(new FileInputStream(file))
+  def build(url: URL): Repository = {
+    val xml = scala.xml.XML.load(url.openStream())
 
     var downloader: ArtifactDownloader = null
     var localRepo: Repo.Local = null
@@ -100,7 +98,7 @@ object RepositoryBuilder {
   }
 
   private def buildJarLoader(gav: String, file: String, location: String, localRepo: Repo.Local,
-    artifacts: Buffer[Artifact], jars: collection.mutable.Map[String, List[URL]]): Unit = {
+                             artifacts: Buffer[Artifact], jars: collection.mutable.Map[String, List[URL]]): Unit = {
     val loc = PathUtils.trimLastSlash(location)
     var jarFile = file
     if (!Strings.isEmpty(gav)) {
