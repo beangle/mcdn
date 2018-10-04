@@ -25,7 +25,7 @@ import org.beangle.commons.lang.Strings
  * Content Repository
  * /path->loader
  */
-class Repository(repos: List[SubRepository]) {
+class Repository(val url: URL, val repos: List[SubRepository]) {
 
   def get(path: String): Option[URL] = {
     repos.find(x => path.startsWith(x.prefix)) match {

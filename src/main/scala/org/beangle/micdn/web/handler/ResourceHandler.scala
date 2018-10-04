@@ -32,6 +32,7 @@ import org.beangle.webmvc.execution.Handler
 
 import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
 import org.beangle.commons.lang.ClassLoaders
+import org.beangle.commons.io.IOs
 
 object ResouceHander extends Logging {
 
@@ -67,11 +68,18 @@ class ResourceHandler extends Handler {
         }
         if (etagChanged(String.valueOf(lastModified), request, response)) {
           CacheControl.expiresAfter(expireMinutes, response)
+          response.setContentLength(conn.getContentLength)
           response.setDateHeader("Last-Modified", lastModified)
           wagon.copy(conn.getInputStream, request, response)
           response.setStatus(HttpServletResponse.SC_OK)
         }
-      case None => response.setStatus(HttpServletResponse.SC_NOT_FOUND)
+      case None =>
+        if (Strings.isEmpty(path)) {
+          response.setContentType("application/xml")
+          IOs.copy(ResouceHander.repository.url.openStream(), response.getOutputStream)
+        } else {
+          response.setStatus(HttpServletResponse.SC_NOT_FOUND)
+        }
     }
   }
 
