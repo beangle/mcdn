@@ -18,32 +18,33 @@
  */
 package org.beangle.micdn.web.handler
 
-import java.io.{ File, FileInputStream }
+import java.io.File
+import java.net.URL
 
 import org.beangle.commons.activation.MimeTypes
-import org.beangle.commons.lang.{ Strings, SystemInfo }
-import org.beangle.commons.lang.annotation.spi
+import org.beangle.commons.lang.Strings
+import org.beangle.commons.logging.Logging
 import org.beangle.commons.web.io.DefaultWagon
 import org.beangle.commons.web.util.RequestUtils
-import org.beangle.webmvc.api.annotation.action
+import org.beangle.micdn.service.{ PathUtils, Repository, RepositoryBuilder }
 import org.beangle.webmvc.api.util.CacheControl
 import org.beangle.webmvc.execution.Handler
 
 import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
-import org.beangle.repo.artifact.Repos
-import org.beangle.micdn.service.RepositoryBuilder
-import org.beangle.micdn.service.Repository
-import java.net.URL
-import org.beangle.micdn.service.PathUtils
+import org.beangle.commons.lang.ClassLoaders
+import org.beangle.commons.io.IOs
 
-object ResouceHander {
+object ResouceHander extends Logging {
 
   val repository: Repository = {
     val configFile = System.getProperty("beangle.micdn.config")
     if (null == configFile) {
-      throw new RuntimeException("Cannot find -Dbeangle.micdn.config property.")
+      logger.warn("Using -Dbeangle.micdn.config=/path/to/cdn.xml to config,now using sample one.")
+      RepositoryBuilder.build(ClassLoaders.getResource("sample.xml").get)
     } else {
-      RepositoryBuilder.build(new File(PathUtils.normalizeFilePath(configFile)))
+      val file = new File(PathUtils.normalizeFilePath(configFile))
+      require(file.exists(), s"${file.getAbsolutePath} doesn't exists!")
+      RepositoryBuilder.build(file.toURI.toURL)
     }
   }
 }
@@ -67,11 +68,18 @@ class ResourceHandler extends Handler {
         }
         if (etagChanged(String.valueOf(lastModified), request, response)) {
           CacheControl.expiresAfter(expireMinutes, response)
+          response.setContentLength(conn.getContentLength)
           response.setDateHeader("Last-Modified", lastModified)
           wagon.copy(conn.getInputStream, request, response)
           response.setStatus(HttpServletResponse.SC_OK)
         }
-      case None => response.setStatus(HttpServletResponse.SC_NOT_FOUND)
+      case None =>
+        if (Strings.isEmpty(path)) {
+          response.setContentType("application/xml")
+          IOs.copy(ResouceHander.repository.url.openStream(), response.getOutputStream)
+        } else {
+          response.setStatus(HttpServletResponse.SC_NOT_FOUND)
+        }
     }
   }
 
