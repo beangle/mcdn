@@ -54,7 +54,8 @@ object RepositoryBuilder {
 
     val subRepos = Collections.newBuffer[SubRepository]
     (xml \ "contents" \ "url").foreach { urlElem =>
-      val prefix = (urlElem \ "@prefix").text
+      var prefix = (urlElem \ "@prefix").text
+      if (!prefix.endsWith("/")) prefix += "/"
 
       val contentLoaders = Collections.newBuffer[ContentLoader]
       val jars = Collections.newMap[String, List[URL]]
@@ -98,7 +99,7 @@ object RepositoryBuilder {
   }
 
   private def buildJarLoader(gav: String, file: String, location: String, localRepo: Repo.Local,
-                             artifacts: Buffer[Artifact], jars: collection.mutable.Map[String, List[URL]]): Unit = {
+    artifacts: Buffer[Artifact], jars: collection.mutable.Map[String, List[URL]]): Unit = {
     val loc = PathUtils.trimLastSlash(location)
     var jarFile = file
     if (!Strings.isEmpty(gav)) {
