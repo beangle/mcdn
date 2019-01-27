@@ -13,5 +13,8 @@
     <url prefix="/cryptojs">
        <webjar gav="org.webjars:cryptojs:3.1.2"/>
     </url>
+    <url prefix="/jquery-ui">
+       <s3jar gav="org.beangle.bundles:beangle-bundles-jquery-ui:1.10.4"/>
+    </url>
   </contents>
 </micdn>
