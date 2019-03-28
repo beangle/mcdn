@@ -78,6 +78,7 @@ class ResourceHandler extends Handler {
           response.setContentType("application/xml")
           IOs.copy(ResouceHander.repository.url.openStream(), response.getOutputStream)
         } else {
+          response.getWriter().write("HTTP status 404")
           response.setStatus(HttpServletResponse.SC_NOT_FOUND)
         }
     }
