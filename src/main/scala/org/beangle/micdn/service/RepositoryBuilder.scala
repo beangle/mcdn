@@ -27,17 +27,20 @@ import org.beangle.commons.collection.Collections
 import org.beangle.commons.lang.Strings
 import org.beangle.repo.artifact.{ Artifact, ArtifactDownloader, Repo }
 import org.beangle.commons.lang.SystemInfo
+import org.beangle.commons.logging.Logging
 
-object RepositoryBuilder {
+object RepositoryBuilder extends Logging {
+  val styles = Map("webjar" -> "META-INF/resources/webjars", "s3" -> "META-INF/resources")
+
   def build(url: URL): Repository = {
     val xml = scala.xml.XML.load(url.openStream())
 
     var downloader: ArtifactDownloader = null
     var localRepo: Repo.Local = null
-    (xml \ "maven").foreach { mavenElem =>
+    (xml \ "repository").foreach { mavenElem =>
       val remote = (mavenElem \ "@remote").text
       if (Strings.isEmpty(remote)) {
-        throw new RuntimeException("maven remote url needed")
+        throw new RuntimeException("repository remote url needed.")
       }
       val localAttr = (mavenElem \ "@local").text
       val local = if (Strings.isEmpty(localAttr)) null else localAttr
@@ -62,21 +65,24 @@ object RepositoryBuilder {
 
       (urlElem \ "jar") foreach { jarElem =>
         val gav = (jarElem \ "@gav").text
-        val file = (jarElem \ "@file").text
-        val location = (jarElem \ "@location").text
-        buildJarLoader(gav, file, location, localRepo, artifacts, jars)
-      }
-
-      (urlElem \ "webjar") foreach { jarElem =>
-        val gav = (jarElem \ "@gav").text
-        val file = (jarElem \ "@file").text
-        buildJarLoader(gav, file, "META-INF/resources/webjars", localRepo, artifacts, jars)
-      }
-
-      (urlElem \ "s3jar") foreach { jarElem =>
-        val gav = (jarElem \ "@gav").text
-        var file = (jarElem \ "@file").text
-        buildJarLoader(gav, file, "META-INF/resources", localRepo, artifacts, jars)
+        if (Strings.isNotEmpty(gav)) {
+          if (gav.contains("org.webjars")) {
+            buildGavJarLoader(gav, "META-INF/resources/webjars", localRepo, artifacts, jars)
+          } else {
+            var location = (jarElem \ "@location").text
+            if (Strings.isEmpty(location)) {
+              location = guessStyle((jarElem \ "@style").text)
+            }
+            buildGavJarLoader(gav, location, localRepo, artifacts, jars)
+          }
+        } else {
+          val file = (jarElem \ "@file").text
+          var location = (jarElem \ "@location").text
+          if (Strings.isEmpty(location)) {
+            location = guessStyle((jarElem \ "@style").text)
+          }
+          buildFileJarLoader(file, location, jars)
+        }
       }
 
       jars.foreach {
@@ -98,15 +104,35 @@ object RepositoryBuilder {
     new Repository(url, subRepos.toList)
   }
 
-  private def buildJarLoader(gav: String, file: String, location: String, localRepo: Repo.Local,
+  private def guessStyle(name: String): String = {
+    styles.get(name) match {
+      case None =>
+        if (!Strings.isEmpty(name)) {
+          logger.warn("Cannot recogonize style :" + name)
+        }
+        "META-INF/resources"
+      case Some(s) => s
+    }
+  }
+
+  private def buildGavJarLoader(gav: String, location: String, localRepo: Repo.Local,
     artifacts: Buffer[Artifact], jars: collection.mutable.Map[String, List[URL]]): Unit = {
     val loc = PathUtils.trimLastSlash(location)
-    var jarFile = file
-    if (!Strings.isEmpty(gav)) {
-      val artifact = Artifact(gav)
-      artifacts += artifact
-      jarFile = localRepo.url(artifact)
+    val artifact = Artifact(gav)
+    artifacts += artifact
+    var jarFile = localRepo.url(artifact)
+    jarFile = PathUtils.normalizeFilePath(jarFile)
+    val url = new File(jarFile).toURI.toURL
+    jars.get(loc) match {
+      case None       => jars.put(loc, List(url))
+      case Some(urls) => jars.put(loc, url :: urls)
     }
+  }
+
+  private def buildFileJarLoader(file: String, location: String,
+    jars: collection.mutable.Map[String, List[URL]]): Unit = {
+    val loc = PathUtils.trimLastSlash(location)
+    var jarFile = file
     jarFile = PathUtils.normalizeFilePath(jarFile)
     val url = new File(jarFile).toURI.toURL
     jars.get(loc) match {
