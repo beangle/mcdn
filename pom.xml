@@ -8,17 +8,17 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.beangle.micdn</groupId>
   <artifactId>beangle-micdn-server</artifactId>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.1.1</version>
   <packaging>war</packaging>
   <name>Beangle Micro CDN Server</name>
 
   <properties>
     <bundle.symbolicName>org.beangle.micdn</bundle.symbolicName>
     <bundle.namespace>org.beangle.micdn</bundle.namespace>
-    <beangle.mvc.version>0.3.25</beangle.mvc.version>
-    <beangle.cdi.version>0.0.17</beangle.cdi.version>
+    <beangle.mvc.version>0.3.26</beangle.mvc.version>
+    <beangle.cdi.version>0.0.18</beangle.cdi.version>
     <beangle.maven.version>0.3.15</beangle.maven.version>
-    <beangle.repo.version>0.0.9</beangle.repo.version>
+    <beangle.repo.version>0.0.10</beangle.repo.version>
   </properties>
 
   <description>
