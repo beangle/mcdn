@@ -25,7 +25,7 @@ import javax.servlet.ServletContext
 
 class Initializer extends org.beangle.commons.web.init.Initializer {
 
-  override def onStartup(sc: ServletContext) {
+  override def onStartup(sc: ServletContext): Unit = {
     val ctxListener = new ContextListener
     ctxListener.childContextConfigLocation = "WebApplicationContext:Action@classpath:spring-web-context.xml"
     val container = ctxListener.loadContainer()

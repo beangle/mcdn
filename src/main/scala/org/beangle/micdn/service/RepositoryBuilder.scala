@@ -18,19 +18,18 @@
  */
 package org.beangle.micdn.service
 
-import java.io.{ File, FileInputStream }
+import java.io.File
 import java.net.URL
-
-import scala.collection.mutable.Buffer
 
 import org.beangle.commons.collection.Collections
 import org.beangle.commons.lang.Strings
-import org.beangle.repo.artifact.{ Artifact, ArtifactDownloader, Repo }
-import org.beangle.commons.lang.SystemInfo
 import org.beangle.commons.logging.Logging
+import org.beangle.repo.artifact.{Artifact, ArtifactDownloader, Repo}
+
+import scala.collection.mutable
 
 object RepositoryBuilder extends Logging {
-  val styles = Map("webjar" -> "META-INF/resources/webjars", "s3" -> "META-INF/resources")
+  val styles: Map[String, String] = Map("webjar" -> "META-INF/resources/webjars", "s3" -> "META-INF/resources")
 
   def build(url: URL): Repository = {
     val xml = scala.xml.XML.load(url.openStream())
@@ -98,7 +97,7 @@ object RepositoryBuilder extends Logging {
     }
     downloader.download(artifacts)
     val notexists = artifacts filter (a => !localRepo.file(a).exists())
-    if (!notexists.isEmpty) {
+    if (notexists.nonEmpty) {
       throw new RuntimeException(s"Cannot download these artifacts:$notexists")
     }
     new Repository(url, subRepos.toList)
@@ -116,7 +115,7 @@ object RepositoryBuilder extends Logging {
   }
 
   private def buildGavJarLoader(gav: String, location: String, localRepo: Repo.Local,
-    artifacts: Buffer[Artifact], jars: collection.mutable.Map[String, List[URL]]): Unit = {
+                                artifacts: mutable.Buffer[Artifact], jars: collection.mutable.Map[String, List[URL]]): Unit = {
     val loc = PathUtils.trimLastSlash(location)
     val artifact = Artifact(gav)
     artifacts += artifact
@@ -124,19 +123,19 @@ object RepositoryBuilder extends Logging {
     jarFile = PathUtils.normalizeFilePath(jarFile)
     val url = new File(jarFile).toURI.toURL
     jars.get(loc) match {
-      case None       => jars.put(loc, List(url))
+      case None => jars.put(loc, List(url))
       case Some(urls) => jars.put(loc, url :: urls)
     }
   }
 
   private def buildFileJarLoader(file: String, location: String,
-    jars: collection.mutable.Map[String, List[URL]]): Unit = {
+                                 jars: collection.mutable.Map[String, List[URL]]): Unit = {
     val loc = PathUtils.trimLastSlash(location)
     var jarFile = file
     jarFile = PathUtils.normalizeFilePath(jarFile)
     val url = new File(jarFile).toURI.toURL
     jars.get(loc) match {
-      case None       => jars.put(loc, List(url))
+      case None => jars.put(loc, List(url))
       case Some(urls) => jars.put(loc, url :: urls)
     }
   }
