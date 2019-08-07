@@ -22,7 +22,7 @@ import java.net.{ URL, URLClassLoader }
 
 object JarContentLoader {
   def apply(location: String, jars: List[URL]): JarContentLoader = {
-    require(jars.size > 0, "jars should not empty")
+    require(jars.nonEmpty, "jars should not empty")
     new JarContentLoader(PathUtils.trimLastSlash(location), jars)
   }
 

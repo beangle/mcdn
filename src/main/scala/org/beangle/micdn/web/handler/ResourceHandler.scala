@@ -21,18 +21,16 @@ package org.beangle.micdn.web.handler
 import java.io.File
 import java.net.URL
 
-import org.beangle.commons.activation.MimeTypes
-import org.beangle.commons.lang.Strings
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import org.beangle.commons.activation.MediaTypes
+import org.beangle.commons.io.IOs
+import org.beangle.commons.lang.{ClassLoaders, Strings}
 import org.beangle.commons.logging.Logging
 import org.beangle.commons.web.io.DefaultWagon
 import org.beangle.commons.web.util.RequestUtils
-import org.beangle.micdn.service.{ PathUtils, Repository, RepositoryBuilder }
+import org.beangle.micdn.service.{PathUtils, Repository, RepositoryBuilder}
 import org.beangle.webmvc.api.util.CacheControl
 import org.beangle.webmvc.execution.Handler
-
-import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
-import org.beangle.commons.lang.ClassLoaders
-import org.beangle.commons.io.IOs
 
 object ResouceHander extends Logging {
 
@@ -53,7 +51,7 @@ class ResourceHandler extends Handler {
 
   val wagon = new DefaultWagon
 
-  val expireMinutes = 60 * 24 * 7
+  val expireMinutes: Int = 60 * 24 * 7
 
   def handle(request: HttpServletRequest, response: HttpServletResponse): Any = {
     val path = RequestUtils.getServletPath(request)
@@ -63,7 +61,7 @@ class ResourceHandler extends Handler {
         val lastModified = conn.getLastModified
         val ext = Strings.substringAfterLast(path, ".")
         if (Strings.isNotEmpty(ext)) {
-          MimeTypes.getMimeType(ext) foreach (m => response.setContentType(m.toString))
+          MediaTypes.get(ext) foreach (m => response.setContentType(m.toString))
           response.addHeader("Access-Control-Allow-Origin", "*")
         }
         if (etagChanged(String.valueOf(lastModified), request, response)) {
@@ -78,7 +76,7 @@ class ResourceHandler extends Handler {
           response.setContentType("application/xml")
           IOs.copy(ResouceHander.repository.url.openStream(), response.getOutputStream)
         } else {
-          response.getWriter().write("HTTP status 404")
+          response.getWriter.write("HTTP status 404")
           response.setStatus(HttpServletResponse.SC_NOT_FOUND)
         }
     }

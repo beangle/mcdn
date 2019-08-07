@@ -18,9 +18,8 @@
  */
 package org.beangle.micdn.service
 
-import java.net.URL
 import java.io.File
-import org.beangle.commons.io.Dirs
+import java.net.URL
 
 class FileContentLoader(dir: File) extends ContentLoader {
 

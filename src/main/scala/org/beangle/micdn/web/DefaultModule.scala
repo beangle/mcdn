@@ -22,7 +22,7 @@ import org.beangle.cdi.bind.BindModule
 
 class DefaultModule extends BindModule {
 
-  override def binding() {
+  override def binding(): Unit = {
     bind(classOf[RouteConfig])
   }
 }

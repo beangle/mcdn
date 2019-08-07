@@ -19,7 +19,6 @@
 package org.beangle.micdn.service
 
 import java.net.URL
-import org.beangle.commons.lang.Strings
 
 /**
  * Content Repository
