@@ -18,7 +18,7 @@
     <beangle.mvc.version>0.3.34</beangle.mvc.version>
     <beangle.cdi.version>0.2.1</beangle.cdi.version>
     <beangle.maven.version>0.3.23</beangle.maven.version>
-    <beangle.repo.version>0.0.13</beangle.repo.version>
+    <beangle.repo.version>0.0.14</beangle.repo.version>
   </properties>
 
   <description>

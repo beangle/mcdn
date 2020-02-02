@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <micdn>
-  <repository remote="http://central.maven.org/maven2"/>
+  <repository remote="https://repo1.maven.org/maven2"/>
   <contents>
     <url prefix="/bootstrap">
        <jar gav="org.webjars:bootstrap:3.3.7"/>
