@@ -47,7 +47,7 @@ object ResouceHander extends Logging {
   }
 }
 
-class ResourceHandler extends Handler {
+class ResourceHandler extends Handler with Logging {
 
   val wagon = new DefaultWagon
 
@@ -63,10 +63,14 @@ class ResourceHandler extends Handler {
         if (Strings.isNotEmpty(ext)) {
           MediaTypes.get(ext) foreach (m => response.setContentType(m.toString))
           response.addHeader("Access-Control-Allow-Origin", "*")
+          if (ext == "js") {
+            response.setCharacterEncoding("utf-8")
+          }
         }
         if (etagChanged(String.valueOf(lastModified), request, response)) {
           CacheControl.expiresAfter(expireMinutes, response)
           response.setContentLength(conn.getContentLength)
+
           response.setDateHeader("Last-Modified", lastModified)
           wagon.copy(conn.getInputStream, request, response)
           response.setStatus(HttpServletResponse.SC_OK)

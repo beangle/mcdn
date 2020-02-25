@@ -91,14 +91,18 @@ object RepositoryBuilder extends Logging {
 
       (urlElem \ "dir") foreach { dirElem =>
         val location = PathUtils.normalizeFilePath((dirElem \ "@location").text)
-        contentLoaders += new FileContentLoader(new File(location))
+        if (new File(location).exists()) {
+          contentLoaders += new FileContentLoader(new File(location))
+        } else {
+          logger.error(s"$location is not exists,ignore it.")
+        }
       }
       subRepos += new SubRepository(prefix, contentLoaders.toList)
     }
     downloader.download(artifacts)
     val notexists = artifacts filter (a => !localRepo.file(a).exists())
     if (notexists.nonEmpty) {
-      throw new RuntimeException(s"Cannot download these artifacts:$notexists")
+      logger.error(s"Cannot download these artifacts:$notexists")
     }
     new Repository(url, subRepos.toList)
   }
