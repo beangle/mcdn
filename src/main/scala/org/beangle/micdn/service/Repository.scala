@@ -28,7 +28,7 @@ class Repository(val url: URL, val repos: List[SubRepository]) {
 
   def get(path: String): Option[URL] = {
     repos.find(x => path.startsWith(x.prefix)) match {
-      case None       => None
+      case None => None
       case Some(repo) => repo.get(path)
     }
   }
