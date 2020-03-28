@@ -30,6 +30,7 @@ import org.beangle.commons.web.io.DefaultWagon
 import org.beangle.commons.web.util.RequestUtils
 import org.beangle.micdn.service.{PathUtils, Repository, RepositoryBuilder}
 import org.beangle.webmvc.api.util.CacheControl
+import org.beangle.webmvc.dispatch.WebResource
 import org.beangle.webmvc.execution.Handler
 
 object ResouceHander extends Logging {
@@ -51,6 +52,7 @@ class ResourceHandler extends Handler with Logging {
 
   val wagon = new DefaultWagon
 
+  //one week
   val expireMinutes: Int = 60 * 24 * 7
 
   def handle(request: HttpServletRequest, response: HttpServletResponse): Any = {
@@ -67,21 +69,25 @@ class ResourceHandler extends Handler with Logging {
             response.setCharacterEncoding("utf-8")
           }
         }
-        if (etagChanged(String.valueOf(lastModified), request, response)) {
-          CacheControl.expiresAfter(expireMinutes, response)
+        if (path.contains("SNAPSHOT")) {
           response.setContentLength(conn.getContentLength)
-
-          response.setDateHeader("Last-Modified", lastModified)
           wagon.copy(conn.getInputStream, request, response)
           response.setStatus(HttpServletResponse.SC_OK)
+        } else {
+          if (etagChanged(String.valueOf(lastModified), request, response)) {
+            CacheControl.expiresAfter(expireMinutes, response)
+            response.setContentLength(conn.getContentLength)
+            response.setDateHeader("Last-Modified", lastModified)
+            wagon.copy(conn.getInputStream, request, response)
+            response.setStatus(HttpServletResponse.SC_OK)
+          }
         }
       case None =>
-        if (Strings.isEmpty(path)) {
+        if (Strings.isEmpty(path) || path == "/") {
           response.setContentType("application/xml")
           IOs.copy(ResouceHander.repository.url.openStream(), response.getOutputStream)
         } else {
-          response.getWriter.write("HTTP status 404")
-          response.setStatus(HttpServletResponse.SC_NOT_FOUND)
+          WebResource.deliver(response, request.getServletContext, path)
         }
     }
   }
