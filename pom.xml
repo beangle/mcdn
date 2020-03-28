@@ -15,9 +15,9 @@
   <properties>
     <bundle.symbolicName>org.beangle.micdn</bundle.symbolicName>
     <bundle.namespace>org.beangle.micdn</bundle.namespace>
-    <beangle.mvc.version>0.3.35</beangle.mvc.version>
+    <beangle.mvc.version>0.3.38</beangle.mvc.version>
     <beangle.cdi.version>0.2.1</beangle.cdi.version>
-    <beangle.maven.version>0.3.23</beangle.maven.version>
+    <beangle.maven.version>0.3.24</beangle.maven.version>
     <beangle.repo.version>0.0.15</beangle.repo.version>
   </properties>
 
@@ -71,6 +71,7 @@
             <id>generate</id>
             <phase>prepare-package</phase>
             <goals>
+              <goal>webxml</goal>
               <goal>sas</goal>
             </goals>
           </execution>
